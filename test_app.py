@@ -10,11 +10,10 @@ class AppTestCase(unittest.TestCase):
     def test_home_page(self):
         response = self.client.get("/")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            b"Hello from GitHub Jenkins CI/CD Pipeline!",
-            response.data
-        )
+        self.assertEqual(response.status_code, 200)          self.assertIn(
+    b"Hello from Automatic GitHub Jenkins CI/CD Pipeline!",
+    response.data
+)
 
 
 if __name__ == "__main__":
