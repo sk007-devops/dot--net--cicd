@@ -13,7 +13,7 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertIn(
-            b"Hello from Automatic GitHub Jenkins CI/CD Pipeline!",
+            b"Hello from Automatic GitHub Jenkins CI/CD Pipeline! by sanket",
             response.data
         )
 
