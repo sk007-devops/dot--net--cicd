@@ -1,4 +1,4 @@
-name: Flask CI Pipeline
+name: Flask CI/CD Pipeline
 
 on:
   push:
@@ -6,6 +6,10 @@ on:
       - main
 
 jobs:
+
+  # =========================
+  # CI - BUILD, TEST AND PUSH
+  # =========================
   build-test-push:
     runs-on: ubuntu-latest
 
@@ -42,7 +46,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-flask-app:${{ github.run_number }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-flask-app:latest
 
-      - name: Run container
+      - name: Test Docker container
         run: |
           docker run -d \
             --name flask-test \
@@ -54,27 +58,39 @@ jobs:
           sleep 5
           curl -f http://localhost:5000
 
-      - name: Cleanup container
+      - name: Cleanup test container
         if: always()
         run: docker rm -f flask-test || true
 
-    deploy-to-kubernetes:
+
+  # =========================
+  # CD - DEPLOY TO KUBERNETES
+  # =========================
+  deploy-to-kubernetes:
     needs: build-test-push
-    runs-on: [self-hosted, Windows, X64]
+
+    runs-on:
+      - self-hosted
+      - Windows
+      - X64
 
     steps:
-      - name: Check Kubernetes
+      - name: Check Kubernetes cluster
         shell: cmd
         run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" get nodes'
 
-      - name: Restart Kubernetes deployment
+      - name: Deploy new Docker image
         shell: cmd
-        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" rollout restart deployment flask-app'
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" set image deployment/flask-app flask-app=${{ secrets.DOCKERHUB_USERNAME }}/github-actions-flask-app:${{ github.run_number }}'
 
-      - name: Wait for deployment
+      - name: Wait for Kubernetes rollout
         shell: cmd
-        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" rollout status deployment flask-app --timeout=120s'
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" rollout status deployment/flask-app --timeout=120s'
 
-      - name: Check pods
+      - name: Check running pods
         shell: cmd
         run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" get pods'
+
+      - name: Check Kubernetes service
+        shell: cmd
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" get service flask-service'
