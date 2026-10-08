@@ -58,23 +58,23 @@ jobs:
         if: always()
         run: docker rm -f flask-test || true
 
-  deploy-to-kubernetes:
+    deploy-to-kubernetes:
     needs: build-test-push
     runs-on: [self-hosted, Windows, X64]
 
     steps:
       - name: Check Kubernetes
         shell: cmd
-        run: kubectl get nodes
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" get nodes'
 
       - name: Restart Kubernetes deployment
         shell: cmd
-        run: kubectl rollout restart deployment flask-app
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" rollout restart deployment flask-app'
 
       - name: Wait for deployment
         shell: cmd
-        run: kubectl rollout status deployment flask-app --timeout=120s
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" rollout status deployment flask-app --timeout=120s'
 
       - name: Check pods
         shell: cmd
-        run: kubectl get pods
+        run: '"C:\Users\SanketSakhakar\AppData\Local\Programs\DockerDesktop\resources\bin\kubectl.exe" get pods'
