@@ -57,3 +57,23 @@ jobs:
       - name: Cleanup container
         if: always()
         run: docker rm -f flask-test || true
+  deploy-to-kubernetes:
+    needs: build-test-push
+    runs-on: [self-hosted, Windows, X64]
+
+    steps:
+      - name: Check Kubernetes
+        shell: powershell
+        run: kubectl get nodes
+
+      - name: Restart Kubernetes deployment
+        shell: powershell
+        run: kubectl rollout restart deployment flask-app
+
+      - name: Wait for deployment
+        shell: powershell
+        run: kubectl rollout status deployment flask-app --timeout=120s
+
+      - name: Check pods
+        shell: powershell
+        run: kubectl get pods
