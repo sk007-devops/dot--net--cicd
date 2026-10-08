@@ -12,10 +12,10 @@ class AppTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-       self.assertIn(
-    b"Version 2 - Automatically deployed to Kubernetes!",
-    response.data
-)
+        self.assertIn(
+            b"Version 2 - Automatically deployed to Kubernetes!",
+            response.data
+        )
 
 
 if __name__ == "__main__":
