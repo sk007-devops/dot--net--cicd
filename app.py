@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Version 2 - Automatically deployed to Kubernetes!"
+    return "this is deployed"
 
 
 if __name__ == "__main__":
